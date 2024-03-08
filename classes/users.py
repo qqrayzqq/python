@@ -8,27 +8,61 @@ class User:
         else:
             raise ValueError("Bad format of email")
 
+    @staticmethod
+    def allchars(s):
+        has_letters = any(char.isalpha() for char in s)
+        has_digits = any(char.isdigit() for char in s)
+        has_special_chars = not s.isalnum()
+        return has_letters and has_digits and has_special_chars
+
+    @staticmethod
+    def mid_passwd(s):
+        has_letters = any(char.isalpha() for char in s)
+        has_digits = any(char.isdigit() for char in s)
+        return has_letters and has_digits
+
     def change_password(self):
+        cnt = 0
         while True:
-            email_check = str(input(f"Hi {self.username}, write your email: \n"))
-            if email_check != self.email:
-                print("It's not your email\n")
-            else:
+            email_check = str(input(f"{self.username}, write your email: \n"))
+            if not self.__check_mail(email_check):
+                print("Invalid email\n")
+                cnt += 1
+            elif email_check == self.email:
                 print("Fine")
                 break
+            elif email_check != self.email:
+                print("It's not your email\n")
+                cnt += 1
+            if cnt == 5:
+                print("Too many attempts, try again later.\n")
+                return
+        cnt = 0
         while True:
-            new_password = input("Print your new password:\n")
+            new_password = input("Now print your new password:\n")
             if self.check_password(new_password):
-                print("You can't make new password like your old password:\n")
+                print("You can't make new password like your old password\n")
             else:
-                self.password = new_password
-                print("It's OK\n")
-                break
+                while True:
+                    if self.allchars(new_password):
+                        print("You have a nice password.\n")
+                        self.password = new_password
+                        return
+                    elif self.mid_passwd(new_password):
+                        print("So so, but okey\n")
+                        self.password = new_password
+                        return
+                    else:
+                        print("Sorry, try more better password.\n")
+                        cnt += 1
+                        if cnt == 3:
+                            print("Too many attempts, try again later.\n")
+                            return
 
     def change_email(self):
         cnt = 0
         while True:
-            email_check = str(input(f"Hi {self.username}, write your new email: \n"))
+            email_check = str(input(f"{self.username}, write your new email: \n"))
             if self.__check_mail(email_check):
                 if email_check == self.email:
                     print("It's your old email.")
@@ -40,7 +74,8 @@ class User:
                 print("Maybe you missclicked, try again.")
                 cnt += 1
             if cnt == 3:
-                raise ValueError("Try again later.")
+                print("Too many attempts, try again later.\n")
+                return
 
     def check_password(self, new_password):
         return new_password == self.password
@@ -62,9 +97,10 @@ class User:
 
     def display_info(self):
         print(f"Username: {self.username}")
-        answers = ["Yes", "yes", "YES", "YeS", "yES", "yEs", "yeS"]
+        answers = ["yes"]
         display_passwd = str(input("Do you want to see your passwd?"))
-        if display_passwd in answers:
+        new_answer = display_passwd.lower()
+        if new_answer in answers:
             email_check = str(input("Write your email to see your password:"))
             if email_check == self.email:
                 print(f"Ok. Here is your password: {self.password}")
@@ -72,16 +108,70 @@ class User:
                 print("Sorry it's not your email.")
 
 
+class BankAccount(User):
+
+    def __init__(self, owner, balance, username, email, password):
+        super().__init__(username, email, password)
+        self.owner = owner
+        self.balance = balance
+
+    def display_account_info(self):
+        print(f"Owner: {self.owner}")
+        print(f"Username: {self.username}")
+        print(f"Balance: {self.balance}$")
+
+    def deposit(self, sum_of_moneys):
+        self.balance += sum_of_moneys
+
+    def withdraw(self, sum_of_moneys):
+        self.balance -= sum_of_moneys
+
+    def check_balance(self):
+        print(f"{self.username} on your account {self.balance}$\n")
+
+
 def create_user(username, email, password):
     return User(username, email, password)
+
+
+def display_balance(account, username):
+    answer = input(f"{username}, do you want to see your balance? (yes/no): ").lower()
+    if answer == "yes":
+        account.display_account_info()
+
+
+def create_bank_account(user):
+    answers = ["yes"]
+    display_passwd = str(input(f"{user.username}, do you want to create your bank account?"))
+    new_answer = display_passwd.lower()
+    if new_answer in answers:
+        name = str(input("Write your name:"))
+        answers = ["yes"]
+        answer = str(input("Do you want to deposit some cash?"))
+        new_answer = answer.lower()
+        if new_answer in answers:
+            money = float(input("How much money?\n"))
+        else:
+            money = 0
+        return BankAccount(name, money, user.username, user.email, user.password), True
+    else:
+        print("Ok, bye\n")
+        return None, False
 
 
 if __name__ == '__main__':
     user1 = create_user("rayzqq", "asirbabayanvlad@gmail.com", "jsbxiq8")
     user2 = create_user("bambo", "bimba@yandex.ru", "nbhq81b")
     user3 = create_user("mindan", "minakov.danil@yahoo.com", "bdkqp")
+    bank_account1, success1 = create_bank_account(user1)
+    bank_account2, success2 = create_bank_account(user2)
+    bank_account3, success3 = create_bank_account(user3)
     user1.change_email()
     user2.change_password()
     user1.display_info()
     user2.display_info()
     user3.display_info()
+    accounts = [(bank_account1, success1, user1.username), (bank_account2, success2, user2.username), (bank_account3, success3, user3.username)]
+    for account, success, username in accounts:
+        if success:
+            display_balance(account, username)
