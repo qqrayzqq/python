@@ -1,4 +1,7 @@
 import random
+from datetime import datetime
+
+
 class User:
 
     def __init__(self, username, email, password):
@@ -115,6 +118,15 @@ class User:
                     print("Too many attempts, try again later")
 
 
+class Transaction:
+    def __init__(self, amount, transaction_type, date, sender, receiver):
+        self.amount = amount
+        self.transaction_type = transaction_type
+        self.date = date
+        self.sender = sender
+        self.receiver = receiver
+
+
 class BankAccount(User):
 
     def __init__(self, owner, balance, username, email, password, number_of_bank_account):
@@ -122,6 +134,7 @@ class BankAccount(User):
         self.owner = owner
         self.balance = balance
         self.number_of_bank_account = 0
+        self.transactions = []
 
     def display_account_info(self):
         print(f"Owner: {self.owner}")
@@ -139,7 +152,6 @@ class BankAccount(User):
         print(f"{self.username} on your account {self.balance}$\n")
 
     def transfer(self, amount, dst):
-            def transfer(self, amount, dst):
         if amount < 0:
             print("Invalid amount\n")
             return
@@ -149,18 +161,20 @@ class BankAccount(User):
         if not isinstance(dst, BankAccount):
             print("Destination account does not exist.")
             return
-        if self.number_of_bank_account == 0 or dst.number_of_bank_account == 0:
-            print("One of the accounts does not exist.")
-            return
         self.balance -= amount
         dst.deposit(amount)
         print(f"Successfully transferred {amount}$ to {dst.owner}'s account.")
+        transaction = Transaction(amount, "transfer", datetime.now(), self.username, dst.username)
+        self.transactions.append(transaction)
+        dst_transaction = Transaction(amount, "transfer", datetime.now(), self.username, dst.username)
+        dst.transactions.append(dst_transaction)
 
-    def history_transactions(self):
-        pass
-
-    def history_transactions(self):
-        pass
+    def display_transactions(self):
+        print(f"{self.owner} all transactions:\n")
+        for transaction in self.transactions:
+            print(f"Date: {transaction.date}, Type: {transaction.transaction_type}, Amount: {transaction.amount}$, "
+                  f"Sender: {transaction.sender}, Receiver: {transaction.receiver}\n")
+        print(f" Now you have {self.balance}$")
 
 
 def create_user(username, email, password):
@@ -201,6 +215,10 @@ if __name__ == '__main__':
     bank_account2, success2 = create_bank_account(user2)
     bank_account3, success3 = create_bank_account(user3)
     bank_account1.transfer(10000, bank_account2)
+    bank_account1.transfer(25000, bank_account3)
+    bank_account1.transfer(20000, bank_account2)
+    bank_account2.display_transactions()
+    bank_account1.display_transactions()
     accounts = [(bank_account1, success1, user1.username), (bank_account2, success2, user2.username),
                 (bank_account3, success3, user3.username)]
     for account, success, username in accounts:
