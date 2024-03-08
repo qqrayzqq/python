@@ -77,9 +77,9 @@ def create_user(username, email, password):
 
 
 if __name__ == '__main__':
-    user1 = create_user("rayzqq", "asirbabayanvlad@gmail.com", "a02082005A")
+    user1 = create_user("rayzqq", "asirbabayanvlad@gmail.com", "jsbxiq8")
     user2 = create_user("bambo", "bimba@yandex.ru", "nbhq81b")
-    user3 = create_user("mindan", "minakov.danil@yahoo.com", "balinday_3")
+    user3 = create_user("mindan", "minakov.danil@yahoo.com", "bdkqp")
     user1.change_email()
     user2.change_password()
     user1.display_info()
