@@ -1,3 +1,4 @@
+import random
 class User:
 
     def __init__(self, username, email, password):
@@ -116,14 +117,16 @@ class User:
 
 class BankAccount(User):
 
-    def __init__(self, owner, balance, username, email, password):
+    def __init__(self, owner, balance, username, email, password, number_of_bank_account):
         super().__init__(username, email, password)
         self.owner = owner
         self.balance = balance
+        self.number_of_bank_account = 0
 
     def display_account_info(self):
         print(f"Owner: {self.owner}")
         print(f"Username: {self.username}")
+        print(f"You number of bank account: {self.number_of_bank_account}")
         print(f"Balance: {self.balance}$")
 
     def deposit(self, sum_of_moneys):
@@ -134,6 +137,18 @@ class BankAccount(User):
 
     def check_balance(self):
         print(f"{self.username} on your account {self.balance}$\n")
+
+    def transfer(self, amount, dst):
+        if amount < 0:
+            print("Invalid amount\n")
+        elif self.balance < amount:
+            print("Don't have enough money.\n")
+        else:
+            self.balance -= amount
+            dst.deposit(amount)
+
+    def history_transactions(self):
+        pass
 
 
 def create_user(username, email, password):
@@ -159,7 +174,8 @@ def create_bank_account(user):
             money = float(input("How much money?\n"))
         else:
             money = 0
-        return BankAccount(name, money, user.username, user.email, user.password), True
+        number = random.randint(100000, 999999)
+        return BankAccount(name, money, user.username, user.email, user.password, number), True
     else:
         print("Ok, bye\n")
         return None, False
@@ -172,12 +188,14 @@ if __name__ == '__main__':
     bank_account1, success1 = create_bank_account(user1)
     bank_account2, success2 = create_bank_account(user2)
     bank_account3, success3 = create_bank_account(user3)
+    bank_account1.transfer(10000, bank_account2)
+    accounts = [(bank_account1, success1, user1.username), (bank_account2, success2, user2.username),
+                (bank_account3, success3, user3.username)]
+    for account, success, username in accounts:
+        if success:
+            display_balance(account, username)
     user1.change_email()
     user2.change_password()
     user1.display_info()
     user2.display_info()
     user3.display_info()
-    accounts = [(bank_account1, success1, user1.username), (bank_account2, success2, user2.username), (bank_account3, success3, user3.username)]
-    for account, success, username in accounts:
-        if success:
-            display_balance(account, username)
