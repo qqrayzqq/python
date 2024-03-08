@@ -139,13 +139,25 @@ class BankAccount(User):
         print(f"{self.username} on your account {self.balance}$\n")
 
     def transfer(self, amount, dst):
+            def transfer(self, amount, dst):
         if amount < 0:
             print("Invalid amount\n")
+            return
         elif self.balance < amount:
             print("Don't have enough money.\n")
-        else:
-            self.balance -= amount
-            dst.deposit(amount)
+            return
+        if not isinstance(dst, BankAccount):
+            print("Destination account does not exist.")
+            return
+        if self.number_of_bank_account == 0 or dst.number_of_bank_account == 0:
+            print("One of the accounts does not exist.")
+            return
+        self.balance -= amount
+        dst.deposit(amount)
+        print(f"Successfully transferred {amount}$ to {dst.owner}'s account.")
+
+    def history_transactions(self):
+        pass
 
     def history_transactions(self):
         pass
