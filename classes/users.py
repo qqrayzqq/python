@@ -133,8 +133,8 @@ class BankAccount(User):
         super().__init__(username, email, password)
         self.owner = owner
         self.balance = balance
-        self.number_of_bank_account = 0
         self.transactions = []
+        self.number_of_bank_account = number_of_bank_account
 
     def display_account_info(self):
         print(f"Owner: {self.owner}")
@@ -181,8 +181,8 @@ def create_user(username, email, password):
     return User(username, email, password)
 
 
-def display_balance(account, username):
-    answer = input(f"{username}, do you want to see your balance? (yes/no): ").lower()
+def display_info_bank(account, username):
+    answer = input(f"{username}, do you want to see your info? (yes/no): ").lower()
     if answer == "yes":
         account.display_account_info()
 
@@ -214,16 +214,38 @@ if __name__ == '__main__':
     bank_account1, success1 = create_bank_account(user1)
     bank_account2, success2 = create_bank_account(user2)
     bank_account3, success3 = create_bank_account(user3)
-    bank_account1.transfer(10000, bank_account2)
-    bank_account1.transfer(25000, bank_account3)
-    bank_account1.transfer(20000, bank_account2)
-    bank_account2.display_transactions()
-    bank_account1.display_transactions()
     accounts = [(bank_account1, success1, user1.username), (bank_account2, success2, user2.username),
                 (bank_account3, success3, user3.username)]
     for account, success, username in accounts:
         if success:
-            display_balance(account, username)
+            while True:
+                action = input(f"What do you want to do {username}?:\n"
+                               f"1.Display info of your bank account.\n2.Do a transfer.\n"
+                               "3.See all of your transactions.\n")
+                if action == "1":
+                    account.display_account_info()
+                elif action == "2":
+                    dst_num = int(input(f"To which account you want to transfer:\n"
+                                       f"1.{user1.username}\n2.{user2.username}\n3.{user3.username}\n"))
+                    dst_account = None
+                    if dst_num == 1:
+                        dst_account = bank_account1
+                    elif dst_num == 2:
+                        dst_account = bank_account2
+                    elif dst_num == 3:
+                        dst_account = bank_account3
+                    if dst_account == account:
+                        print("You can't transfer to yourself.\n")
+                    else:
+                        amount = int(input("Write the amount.\n"))
+                        account.transfer(amount, dst_account)
+                elif action == "3":
+                    account.display_transactions()
+                answer = input("This is all?\n").lower()
+                if answer == 'yes':
+                    break
+                else:
+                    pass
     user1.change_email()
     user2.change_password()
     user1.display_info()
