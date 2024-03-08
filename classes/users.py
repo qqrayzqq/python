@@ -3,14 +3,18 @@ class User:
     def __init__(self, username, email, password):
         self.username = username
         self.password = password
-        self.email = email
+        if self.__check_mail(email):
+            self.email = email
+        else:
+            raise ValueError("Bad format of email")
 
     def change_password(self):
         while True:
             email_check = str(input(f"Hi {self.username}, write your email: \n"))
-            if not self.check_mail(email_check):
+            if email_check != self.email:
                 print("It's not your email\n")
             else:
+                print("Fine")
                 break
         while True:
             new_password = input("Print your new password:\n")
@@ -22,27 +26,50 @@ class User:
                 break
 
     def change_email(self):
+        cnt = 0
         while True:
             email_check = str(input(f"Hi {self.username}, write your new email: \n"))
-            if self.check_mail(email_check):
-                print("It's your old email\n")
+            if self.__check_mail(email_check):
+                if email_check == self.email:
+                    print("It's your old email.")
+                else:
+                    self.email = email_check
+                    print("It OK\n")
+                    break
             else:
-                self.email = email_check
-                print("It OK\n")
-                break
+                print("Maybe you missclicked, try again.")
+                cnt += 1
+            if cnt == 3:
+                raise ValueError("Try again later.")
 
     def check_password(self, new_password):
         return new_password == self.password
 
-    def check_mail(self, new_email):
-        return new_email == self.email
+    @staticmethod
+    def __check_mail(mail: str) -> bool:
+        correct_formats = ["@gmail.com", "@yandex.ru", "@yahoo.com"]
+        for char in mail:
+            if char == '@':
+                index_of_rate = mail.index(char)
+                after_rate: str = mail[index_of_rate:]
+                if after_rate not in correct_formats:
+                    return False
+                else:
+                    return True
+            else:
+                pass
+        return False
 
     def display_info(self):
-        print(f"Username: {self.username}, email: {self.email}")
-        answers = ["Yes", "yes"]
+        print(f"Username: {self.username}")
+        answers = ["Yes", "yes", "YES", "YeS", "yES", "yEs", "yeS"]
         display_passwd = str(input("Do you want to see your passwd?"))
         if display_passwd in answers:
-            print(f"Here is your passwd: {self.password}")
+            email_check = str(input("Write your email to see your password:"))
+            if email_check == self.email:
+                print(f"Ok. Here is your password: {self.password}")
+            else:
+                print("Sorry it's not your email.")
 
 
 def create_user(username, email, password):
