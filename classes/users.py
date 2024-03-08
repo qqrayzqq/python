@@ -98,14 +98,20 @@ class User:
     def display_info(self):
         print(f"Username: {self.username}")
         answers = ["yes"]
-        display_passwd = str(input("Do you want to see your passwd?"))
+        display_passwd = str(input("Do you want to see your passwd?\n"))
         new_answer = display_passwd.lower()
+        cnt = 0
         if new_answer in answers:
-            email_check = str(input("Write your email to see your password:"))
-            if email_check == self.email:
-                print(f"Ok. Here is your password: {self.password}")
-            else:
-                print("Sorry it's not your email.")
+            while True:
+                email_check = str(input("Write your email to see your password:\n"))
+                if email_check == self.email:
+                    print(f"Ok. Here is your password: {self.password}\n")
+                    break
+                else:
+                    print("It's not your email.\n")
+                    cnt += 1
+                if cnt == 3:
+                    print("Too many attempts, try again later")
 
 
 class BankAccount(User):
